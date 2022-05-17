@@ -5,7 +5,7 @@
 My intention was to have this document run code and have plots, but I ran into a couple issues.  Referenced figures are in the **images** directory
 
 ## Document Segmentation
-- The documents are all contain the same headers, so they were segmented by the header titles.
+- The documents mostly contain the same couple variations of headers, so they were segmented by the header titles.
 - This likely wouldn't work in a real scenario due to formatting differences across document types, hospitals, and departments.  In that case, a more sophisticated document segmentation approach would be needed.
 - There are a number of topic-based segmentation approaches which work especially well with embeddings
     - [Unsupervised Topic Segmentation of Meetings with BERT Embeddings](https://arxiv.org/abs/2106.12978)
@@ -24,7 +24,7 @@ My intention was to have this document run code and have plots, but I ran into a
 
 ## LDA Results
 - The note sections were processed further for LDA
-  - Limited the document sections to procedure, HPI, course, and discharge diagnosis.  Discharge dispositon and chief complaint could be informative, depending on the objectives of the analysis.
+  - Limited the document sections to procedure, HPI, course, major procedures,and discharge diagnosis.  Discharge dispositon and chief complaint could be informative, depending on the objectives of the analysis.
   - The sections were recombined for each stay (assuming each note was a unique patient/stay)
   - punctuation, numbers, and stop words were removed
   - TF-IDF was applied.
@@ -37,7 +37,7 @@ My intention was to have this document run code and have plots, but I ran into a
 
 ## Embedding Results
 - Sections were embedded individually and averaged together to get a single embedding for a stay/patient
-- Spectral clustering was used due to the high-dimensionality of the embeddings.  The distribusion of the clusters looks good.
+- Spectral clustering was used due to the high-dimensionality of the embeddings.  The distribution of the clusters looks good.
   - See ./images/embedding_label_counts.png
 - The scatter plot doesn't show great separation, but I think this is due to the dimensionality of the embeddings.
   - See ./images/embedding_cluster_scatter.png
