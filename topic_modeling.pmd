@@ -1,0 +1,56 @@
+% Cohere Interview Take-Home Assessment
+% Brandon Stange
+% 05/17/2022
+
+My intention was to have this document run code and have plots, but I ran into a couple issues.  Referenced figures are in the **images** directory
+
+## Document Segmentation
+- The documents are all contain the same headers, so they were segmented by the header titles.
+- This likely wouldn't work in a real scenario due to formatting differences across document types, hospitals, and departments.  In that case, a more sophisticated document segmentation approach would be needed.
+- There are a number of topic-based segmentation approaches which work especially well with embeddings
+    - [Unsupervised Topic Segmentation of Meetings with BERT Embeddings](https://arxiv.org/abs/2106.12978)
+    - [Topic Segmentation with an Aspect Hidden Markov Model](https://www.cs.columbia.edu/~blei/papers/BleiMoreno2001.pdf)
+- data_processing.py contains code to process the documents
+
+
+## Section Embeddings
+- Two approaches were tried
+  - LDA, a classic topic modeling approach
+  - Language Model based embeddings
+- The embeddings were generated with a BioBERT-based model fine-tuned on disease prediction
+  - [CORe Model - Clinical Diagnosis Prediction](https://huggingface.co/bvanaken/CORe-clinical-diagnosis-prediction)
+  - A few different models were tried.  The model trained on diagnosis prediction seemed to have slightly better differentiation for this task.
+
+
+## LDA Results
+- The note sections were processed further for LDA
+  - Limited the document sections to procedure, HPI, course, and discharge diagnosis.  Discharge dispositon and chief complaint could be informative, depending on the objectives of the analysis.
+  - The sections were recombined for each stay (assuming each note was a unique patient/stay)
+  - punctuation, numbers, and stop words were removed
+  - TF-IDF was applied.
+- 30 topics were used.  Fewer topics resulted in clusters that were too imbalanced to be useful.
+  - See ./images/lda_label_counts.png
+- UMAP was used to reduce the dimensionality for plotting the clusters
+  - See ./images/lsa_cluster_scatter.png
+
+
+
+## Embedding Results
+- Sections were embedded individually and averaged together to get a single embedding for a stay/patient
+- Spectral clustering was used due to the high-dimensionality of the embeddings.  The distribusion of the clusters looks good.
+  - See ./images/embedding_label_counts.png
+- The scatter plot doesn't show great separation, but I think this is due to the dimensionality of the embeddings.
+  - See ./images/embedding_cluster_scatter.png
+  - Reducing the size of the embeddings in the model itself might yield better dimensionality reduction.
+
+
+## Future Exploration
+1. Much more sophisticated document embeddings.
+  - Break out longer sections into sub embeddings around topics
+  - Hierarchical clustering of overall documents
+  - Explore other options for combining of embeddings
+  - Combine small sections with their heading for context
+2. Comparison of segmented embeddings to embeddings of something like SNOMED
+3. Combinations of explicit extraction methods for things like diseases / procedures / drugs with embeddings for summary sections
+4. It looks like there has been some expansion of NER modeling on clinical notes in the past two years.  There are a number of pre-trained language models intended to do it.  I’m curious how they compare to something like apache cTAKES.
+5. Automatic labelling of embedding clusters with c-tf-idf
